@@ -1,7 +1,6 @@
 # from __future__ import print_function
 from pymongo import MongoClient
 from flask import Flask
-import secrets
 import tweepy
 import json
 
