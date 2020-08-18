@@ -74,6 +74,11 @@ class TweetObject():
 
             # only use stem of word
             words = [ps.stem(word) for word in words]
+
+            print('asdfghjklñ')
+            print(df)
+            print(df[i])
+
             df['clean_tweets'][i] = ' '.join(words)
 
         # Create column with data length

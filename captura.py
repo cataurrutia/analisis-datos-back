@@ -39,7 +39,6 @@ class StreamListener(tweepy.StreamListener):
         return False
 
     def on_data(self, data):
-        print('are we here yet????')
 
         try:
             # Connects to mongoDB and stores the tweet
