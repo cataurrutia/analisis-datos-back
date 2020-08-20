@@ -15,7 +15,6 @@ from wordcloud import WordCloud, STOPWORDS
 from textblob import TextBlob
 from pymongo import MongoClient
 
-
 MONGO_HOST = 'mongodb://localhost/twitterdb'
 
 try:
@@ -31,22 +30,20 @@ class TweetObject():
     def connect_mongo(self):
 
         try:
-            # Connect to mongo, to de db and to the col
+            # Instance MongoClient
             client = MongoClient(MONGO_HOST)
-            # db = client.pruebadb
-            db = client.climateinfo
-            col = db.filtered_tweets
 
-            # Save info from collection to pandas dataframe
+            db = client.pruebadb
+            # db = client.climateinfo
+
+            # Store info from "twitter_search" collection into pandas dataframe
             df = pdm.read_mongo("filtered_tweets", [], db)
 
-            print('Tenemos el dataframe')
-            print(df)
+            # print(df.head())
             return df
 
         except Error as e:
-            pass
-            # print(e)
+            print(e)
 
     # Clean raw tweets, remove stopwords, punctuation, lower case all, html and emoticons
     # This will be done using Regex, ? means option so colou?r matches both color and colour.
@@ -54,35 +51,36 @@ class TweetObject():
     def clean_tweets(self, df):
         # Preprocessing
 
-        stop = nltk.download('stopwords')
+        # stop = nltk.download('stopwords')
         stopword_list = stopwords.words('english')
 
         ps = PorterStemmer()
 
-        df["clean_tweets"] = None
+        # Create additional columns
+        df['clean_tweets'] = None
         df['len'] = None
 
         # get rid of anything that isn't a letter
         for i in range(0, len(df['tweet'])):
-
             exclusion_list = ['[^a-zA-Z]', 'rt', 'http', 'co', 'RT']
             exclusions = '|'.join(exclusion_list)
+
             text = re.sub(exclusions, ' ', df['tweet'][i])
             text = text.lower()
+
             words = text.split()
             words = [word for word in words if not word in stopword_list]
 
             # only use stem of word
-            words = [ps.stem(word) for word in words]
+            # words = [ps.stem(word) for word in words]
 
-            print('asdfghjklñ')
-            print(df)
-            print(df[i])
+            # Fill up columns with cleaned tweets and data length
+            df.loc[:, 'clean_tweets'][i] = ' '.join(words)
 
-            df['clean_tweets'][i] = ' '.join(words)
+        df.loc[:, 'len'] = np.array([len(tweet) for tweet in df['clean_tweets']])
 
-        # Create column with data length
-        df['len'] = np.array([len(tweet) for tweet in df["clean_tweets"]])
+        # print(df)
+
         return df
 
     # This function calculates sentiment on our cleaned tweets. Uses textblob to calculate polarity.
@@ -106,7 +104,8 @@ class TweetObject():
         try:
             df.to_csv("clean_tweets.csv")
             print("\n")
-            print("csv successfully saved. Yaaaaaaaaay \n")
+            print('CSV is NOT being saved yet hehehe')
+            # print("csv successfully saved. Yaaaaaaaaay \n")
 
         except Error as e:
             print(e)
@@ -116,17 +115,19 @@ class TweetObject():
     # Create wordcloud using mpl
 
     def word_cloud(self, df):
-        print('aentroooo')
+        # print('aentroooo')
+        text = " ".join(df['clean_tweets'])
         figu = plt.subplots(figsize=(12, 10))
-        wordcloud = WordCloud(
-            background_color='white',
-            width=1000,
-            height=800).generate(" ".join(df['clean_tweets']))
-        figu.imshow(wordcloud)
-        figu.axis('off')
-        figu.show()
-        return
 
+        print(text)
+
+        wordcloud = WordCloud(background_color='white', width=1000, height=800).generate(text)
+
+        # figu.imshow(wordcloud)
+        # figu.axis('off')
+        # print('figuraaaaaa')
+        # figu.show()
+        return
 
 
 # tw = TweetObject()
@@ -142,21 +143,22 @@ if __name__ == '__main__':
     data = TweetObject.connect_mongo(t)
 
     data = t.clean_tweets(data)
-    print('------------------------------Yesssss-------------------------------------')
 
     data['Sentiment'] = np.array([t.sentiment(x) for x in data['clean_tweets']])
-    print('holi')
-    #
-    # t.word_cloud(data)
-    # t.save_to_csv(data)
-    #
-    # print('holi2')
-    #
-    # pos_tweets = [tweet for index, tweet in enumerate(data["clean_tweets"]) if data["Sentiment"][index] > 0]
-    # neg_tweets = [tweet for index, tweet in enumerate(data["clean_tweets"]) if data["Sentiment"][index] < 0]
-    # neu_tweets = [tweet for index, tweet in enumerate(data["clean_tweets"]) if data["Sentiment"][index] == 0]
-    #
-    # # Print results
-    # print("percentage of positive tweets: {}%".format(100 * (len(pos_tweets) / len(data['clean_tweets']))))
-    # print("percentage of negative tweets: {}%".format(100 * (len(neg_tweets) / len(data['clean_tweets']))))
-    # print("percentage of neutral tweets: {}%".format(100 * (len(neu_tweets) / len(data['clean_tweets']))))
+
+    # print(data)
+
+    t.word_cloud(data)
+    t.save_to_csv(data)
+
+    print('------------------------------Yesssss-------------------------------------')
+
+
+    pos_tweets = [tweet for index, tweet in enumerate(data["clean_tweets"]) if data["Sentiment"][index] > 0]
+    neg_tweets = [tweet for index, tweet in enumerate(data["clean_tweets"]) if data["Sentiment"][index] < 0]
+    neu_tweets = [tweet for index, tweet in enumerate(data["clean_tweets"]) if data["Sentiment"][index] == 0]
+
+    # Print results
+    print("percentage of positive tweets: {}%".format(100 * (len(pos_tweets) / len(data['clean_tweets']))))
+    print("percentage of negative tweets: {}%".format(100 * (len(neg_tweets) / len(data['clean_tweets']))))
+    print("percentage of neutral tweets: {}%".format(100 * (len(neu_tweets) / len(data['clean_tweets']))))
