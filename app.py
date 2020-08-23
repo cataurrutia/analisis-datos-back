@@ -1,21 +1,12 @@
-from flask import Flask
+from flask import Flask, render_template, url_for, request, redirect
+
 app = Flask(__name__)
+
 
 @app.route('/')
 def hello_world():
-    return """
-        <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Wowowo</title>
+    return render_template('index.html')
 
-</head>
-<body>
-<img src="wordcloud.png">
-</body>
-</html>
-    """
 
 # prueba recibir parametros
 # http://http//167.99.231.117:5000/api/llamada?parametro=1000

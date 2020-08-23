@@ -125,7 +125,7 @@ class TweetObject():
         plt.axis('off')
         plt.savefig('wordcloud.png')
 
-        plt.show()
+        # plt.show()
         return
 
 
