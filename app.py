@@ -3,7 +3,9 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    return 'Hallo, willkommen!'
+    return """
+        
+    """
 
 # prueba recibir parametros
 # http://http//167.99.231.117:5000/api/llamada?parametro=1000
