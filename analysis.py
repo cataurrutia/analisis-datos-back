@@ -30,11 +30,10 @@ class TweetObject():
     def connect_mongo(self):
 
         try:
-            # Instance MongoClient
             client = MongoClient(MONGO_HOST)
 
-            db = client.pruebadb
-            # db = client.climateinfo
+            # db = client.pruebadb
+            db = client.climateinfo
 
             # Store info from "twitter_search" collection into pandas dataframe
             df = pdm.read_mongo("filtered_tweets", [], db)
@@ -52,7 +51,7 @@ class TweetObject():
         # Preprocessing
 
         # stop = nltk.download('stopwords')
-        stopword_list = stopwords.words('english')
+        stopword_list = stopwords.words('spanish')
 
         ps = PorterStemmer()
 
@@ -115,18 +114,17 @@ class TweetObject():
     # Create wordcloud using mpl
 
     def word_cloud(self, df):
-        # print('aentroooo')
+
         text = " ".join(df['clean_tweets'])
-        figu = plt.subplots(figsize=(12, 10))
 
-        print(text)
+        wordcloud = WordCloud(background_color='white').generate(text)
+        # wordcloud = WordCloud(background_color='white', width=1000, height=800).generate(text)
 
-        wordcloud = WordCloud(background_color='white', width=1000, height=800).generate(text)
+        plt.imshow(wordcloud, interpolation='bilinear')
+        plt.axis('off')
+        plt.show()
 
-        # figu.imshow(wordcloud)
-        # figu.axis('off')
-        # print('figuraaaaaa')
-        # figu.show()
+        # figu = plt.subplots(figsize=(12, 10))
         return
 
 
@@ -146,19 +144,16 @@ if __name__ == '__main__':
 
     data['Sentiment'] = np.array([t.sentiment(x) for x in data['clean_tweets']])
 
-    # print(data)
-
     t.word_cloud(data)
-    t.save_to_csv(data)
-
-    print('------------------------------Yesssss-------------------------------------')
-
+    # t.save_to_csv(data)
 
     pos_tweets = [tweet for index, tweet in enumerate(data["clean_tweets"]) if data["Sentiment"][index] > 0]
     neg_tweets = [tweet for index, tweet in enumerate(data["clean_tweets"]) if data["Sentiment"][index] < 0]
     neu_tweets = [tweet for index, tweet in enumerate(data["clean_tweets"]) if data["Sentiment"][index] == 0]
+    tweet_count = data.shape[0]
 
     # Print results
-    print("percentage of positive tweets: {}%".format(100 * (len(pos_tweets) / len(data['clean_tweets']))))
-    print("percentage of negative tweets: {}%".format(100 * (len(neg_tweets) / len(data['clean_tweets']))))
-    print("percentage of neutral tweets: {}%".format(100 * (len(neu_tweets) / len(data['clean_tweets']))))
+    print("Positive tweets: {}%".format(100 * (len(pos_tweets) / len(data['clean_tweets']))))
+    print("Negative tweets: {}%".format(100 * (len(neg_tweets) / len(data['clean_tweets']))))
+    print("Neutral tweets: {}%".format(100 * (len(neu_tweets) / len(data['clean_tweets']))))
+    print(f"De un total de: {tweet_count} tweets")

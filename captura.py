@@ -14,7 +14,7 @@ ACCESS_TOKEN_SECRET = "1PGWrCu8huiKyz7FyH1erKciFy6dsW1tdpla5sFLS7lmX"
 # WORDS = ['#bigdata', '#AI', '#datascience', '#machinelearning', '#ml', '#iot', 'DuocUC']
 # WORDS = ['Biden', 'covid', 'Trump', 'democrats', 'Bernie', 'AOC']
 # WORDS = ['climate change', 'global warming', 'climate tracking', 'climate action', 'pollution', 'co2 emissions ', 'greenhouse gas']
-# WORDS = ['Medioambiente', 'sismologia', 'Chile', 'cambio climatico', 'efecto invernadero', '']
+WORDS = ['Medioambiente', 'sismologia', 'Chile', 'glaciares', 'cambio climatico', 'Deshielo', 'calentamiento global']
 
 # Class provided by tweepy to access the Twitter Streaming API.
 class StreamListener(tweepy.StreamListener):
