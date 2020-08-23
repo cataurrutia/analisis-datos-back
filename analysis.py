@@ -114,6 +114,7 @@ class TweetObject():
     # Create wordcloud using mpl
 
     def word_cloud(self, df):
+        # figu = plt()
 
         text = " ".join(df['clean_tweets'])
 
@@ -122,9 +123,9 @@ class TweetObject():
 
         plt.imshow(wordcloud, interpolation='bilinear')
         plt.axis('off')
-        plt.show()
+        plt.savefig('wordcloud.png')
 
-        # figu = plt.subplots(figsize=(12, 10))
+        plt.show()
         return
 
 
