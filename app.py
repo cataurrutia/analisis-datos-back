@@ -4,7 +4,17 @@ app = Flask(__name__)
 @app.route('/')
 def hello_world():
     return """
-        
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wowowo</title>
+
+</head>
+<body>
+<img src="wordcloud.png">
+</body>
+</html>
     """
 
 # prueba recibir parametros
