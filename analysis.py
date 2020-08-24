@@ -115,6 +115,7 @@ class TweetObject():
 
     def word_cloud(self, df):
         # figu = plt()
+        print('jejeje')
 
         text = " ".join(df['clean_tweets'])
 
