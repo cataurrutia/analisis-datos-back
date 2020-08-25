@@ -77,7 +77,9 @@ class TweetObject():
             df.loc[:, 'clean_tweets'][i] = ' '.join(words)
 
         df.loc[:, 'len'] = np.array([len(tweet) for tweet in df['clean_tweets']])
-        # db.filstered_tweets.insert_one(df)
+
+        # save clean tweets to new collection
+        # db.new_collection.insert_one(df)
 
         # print(df)
 
