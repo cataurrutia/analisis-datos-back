@@ -106,7 +106,7 @@ class TweetObject():
         try:
             df.to_csv("clean_tweets.csv")
             print("\n")
-            print('CSV is NOT being saved yet hehehe')
+            print('CSV is being saved on current folder')
             # print("csv successfully saved. Yaaaaaaaaay \n")
 
         except Error as e:
@@ -118,12 +118,10 @@ class TweetObject():
 
     def word_cloud(self, df):
         # figu = plt()
-        print('jejeje')
 
         text = " ".join(df['clean_tweets'])
 
         wordcloud = WordCloud(background_color='white').generate(text)
-        # wordcloud = WordCloud(background_color='white', width=1000, height=800).generate(text)
 
         plt.imshow(wordcloud, interpolation='bilinear')
         plt.axis('off')
@@ -150,7 +148,7 @@ if __name__ == '__main__':
     data['Sentiment'] = np.array([t.sentiment(x) for x in data['clean_tweets']])
 
     t.word_cloud(data)
-    # t.save_to_csv(data)
+    t.save_to_csv(data)
 
     pos_tweets = [tweet for index, tweet in enumerate(data["clean_tweets"]) if data["Sentiment"][index] > 0]
     neg_tweets = [tweet for index, tweet in enumerate(data["clean_tweets"]) if data["Sentiment"][index] < 0]
