@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import ssl
+import datetime as dt
 
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -102,14 +103,16 @@ class TweetObject():
     # Save cleaned data to a csv for further analysis.
 
     def save_to_csv(self, df):
+        # yyyy-mm-dd
+        fecha = dt.date.today()
 
         try:
-            df.to_csv("clean_tweets.csv")
+            df.to_csv(f'csv/clean_tweets_{fecha}.csv')
             print("\n")
             print('CSV is being saved on current folder')
             # print("csv successfully saved. Yaaaaaaaaay \n")
 
-        except Error as e:
+        except Exception as e:
             print(e)
 
         return
