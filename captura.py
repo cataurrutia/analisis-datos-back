@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from flask import Flask
 import tweepy
 import json
+import time
 
 MONGO_HOST = 'mongodb://localhost/twitterdb'
 
@@ -15,6 +16,15 @@ ACCESS_TOKEN_SECRET = "RyR8nnFdz1SQiS3D9QMd039pnpajsq41A5H21lAo3sWQt"
 # WORDS = ['Biden', 'covid', 'Trump', 'democrats', 'Bernie', 'AOC']
 # WORDS = ['climate change', 'global warming', 'climate tracking', 'climate action', 'pollution', 'co2 emissions ', 'greenhouse gas']
 WORDS = ['Medioambiente', 'Chile', 'glaciares', 'cambioclimatico', 'Deshielo', 'calentamientoglobal']
+
+
+# Pausa para no sobrecargar de peticiones los servidores de twitter
+def limit_handler(cursor):
+    try:
+        while True:
+            yield cursor.next()
+    except RateLimitError:
+        time.sleep(1000)
 
 
 # Class provided by tweepy to access the Twitter Streaming API.
@@ -85,6 +95,10 @@ class StreamListener(tweepy.StreamListener):
 
         except Exception as e:
             print(e)
+        except tweepy.TweepError as e:
+            print(e.reason)
+        except StopIteration:
+            pass
 
 
 if __name__ == '__main__':
