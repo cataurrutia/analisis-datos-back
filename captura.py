@@ -6,15 +6,16 @@ import json
 
 MONGO_HOST = 'mongodb://localhost/twitterdb'
 
-CONSUMER_KEY = "hIGV5TpFaURCs2nzha6A0fzvH"
-CONSUMER_SECRET = "shbtDMjMQcEacrYNbG4keoKYldWX5sdwM6HhhQDMqhug7v4QU6"
-ACCESS_TOKEN = "1248836564379148288-t8zfOgtcK67ue0Htb4oPXpAlvcoJ25"
-ACCESS_TOKEN_SECRET = "1PGWrCu8huiKyz7FyH1erKciFy6dsW1tdpla5sFLS7lmX"
+CONSUMER_KEY = "1l6Uaxb65mR6rqtvODXs1efB9"
+CONSUMER_SECRET = "CZVDMzoweq35K7BdXiynEcqw9kE9iFQPMDQyOJ6T8eUqL4aj0h"
+ACCESS_TOKEN = "702892689080115200-JANKXmIOyxk234nHqOwio9sSD213efz"
+ACCESS_TOKEN_SECRET = "RyR8nnFdz1SQiS3D9QMd039pnpajsq41A5H21lAo3sWQt"
 
 # WORDS = ['#bigdata', '#AI', '#datascience', '#machinelearning', '#ml', '#iot', 'DuocUC']
 # WORDS = ['Biden', 'covid', 'Trump', 'democrats', 'Bernie', 'AOC']
 # WORDS = ['climate change', 'global warming', 'climate tracking', 'climate action', 'pollution', 'co2 emissions ', 'greenhouse gas']
 WORDS = ['Medioambiente', 'Chile', 'glaciares', 'cambioclimatico', 'Deshielo', 'calentamientoglobal']
+
 
 # Class provided by tweepy to access the Twitter Streaming API.
 class StreamListener(tweepy.StreamListener):
@@ -100,4 +101,3 @@ if __name__ == '__main__':
     print("Utilizando las palabras: " + str(WORDS))
 
     stream.filter(track=WORDS)
-
