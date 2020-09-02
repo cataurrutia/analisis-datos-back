@@ -82,7 +82,7 @@ class TweetObject():
         # save clean tweets to new collection
         # db.new_collection.insert_one(df)
 
-        # print(df)
+        print(df)
 
         return df
 
@@ -103,14 +103,10 @@ class TweetObject():
     # Save cleaned data to a csv for further analysis.
 
     def save_to_csv(self, df):
-        # yyyy-mm-dd
-        fecha = dt.date.today()
-
         try:
-            df.to_csv(f'csv/clean_tweets_{fecha}.csv')
+            df.to_csv(f'csv/clean_tweets_{dt.date.today()}.csv')
             print("\n")
-            print('CSV is being saved on current folder')
-            # print("csv successfully saved. Yaaaaaaaaay \n")
+            print("csv successfully saved, yaaaaaaaaay! \n")
 
         except Exception as e:
             print(e)
@@ -133,13 +129,6 @@ class TweetObject():
         # plt.show()
         return
 
-
-# tw = TweetObject()
-# original_df = TweetObject.connect_mongo(tw)
-
-# print(type(original_df))
-# print(original_df)
-# print(TweetObject.clean_tweets(tw, original_df))
 
 if __name__ == '__main__':
     t = TweetObject()

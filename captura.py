@@ -1,9 +1,10 @@
 # from __future__ import print_function
-from pymongo import MongoClient
-from flask import Flask
-import tweepy
 import json
 import time
+import pandas as pd
+
+import tweepy
+from pymongo import MongoClient
 
 MONGO_HOST = 'mongodb://localhost/twitterdb'
 
@@ -15,7 +16,8 @@ ACCESS_TOKEN_SECRET = "RyR8nnFdz1SQiS3D9QMd039pnpajsq41A5H21lAo3sWQt"
 # WORDS = ['#bigdata', '#AI', '#datascience', '#machinelearning', '#ml', '#iot', 'DuocUC']
 # WORDS = ['Biden', 'covid', 'Trump', 'democrats', 'Bernie', 'AOC']
 # WORDS = ['climate change', 'global warming', 'climate tracking', 'climate action', 'pollution', 'co2 emissions ', 'greenhouse gas']
-WORDS = ['Medioambiente', 'Chile', 'glaciares', 'cambioclimatico', 'Deshielo', 'calentamientoglobal']
+# WORDS = ['Medioambiente', 'Chile', 'glaciares', 'cambioclimatico', 'Deshielo', 'calentamientoglobal']
+search_words = []
 
 
 # Pausa para no sobrecargar de peticiones los servidores de twitter
@@ -25,6 +27,16 @@ def limit_handler(cursor):
             yield cursor.next()
     except RateLimitError:
         time.sleep(1000)
+
+
+# Class to unpack google trends csv and select only the list of relevant topics
+def search_terms():
+    # load google trend csv
+    filter = pd.read_csv('csv/search_terms.csv')
+    filter = filter['Tema']
+
+    global search_words
+    search_words = filter.to_list()
 
 
 # Class provided by tweepy to access the Twitter Streaming API.
@@ -88,7 +100,7 @@ class StreamListener(tweepy.StreamListener):
 
             # Insert data into mongoDB in a collection called filtered_tweets
             # If filtered_tweets doesn't exist, it will create it.
-            db.filtered_tweets.insert_one(tweet_info)
+            db.longfiltertweets.insert_one(tweet_info)
 
             # Save full raw data from tweets
             # db.raw_tweets.insert_one(raw_data)
@@ -102,6 +114,9 @@ class StreamListener(tweepy.StreamListener):
 
 
 if __name__ == '__main__':
+    # Set filter words
+    search_terms()
+
     # Tweepy authentication
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
@@ -112,6 +127,6 @@ if __name__ == '__main__':
     # Set up the Stream from tweepy
     stream = tweepy.Stream(auth=auth, listener=listener)
 
-    print("Utilizando las palabras: " + str(WORDS))
+    print("Utilizando las palabras: " + str(search_words))
 
-    stream.filter(track=WORDS)
+    stream.filter(track=search_words)
