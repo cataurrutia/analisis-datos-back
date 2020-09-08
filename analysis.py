@@ -37,7 +37,7 @@ class TweetObject():
             db = client.climateinfo
 
             # Store info from "twitter_search" collection into pandas dataframe
-            df = pdm.read_mongo("filtered_tweets", [], db)
+            df = pdm.read_mongo("longfiltertweets", [], db)
 
             # print(df.head())
             return df
