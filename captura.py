@@ -8,10 +8,15 @@ from pymongo import MongoClient
 
 MONGO_HOST = 'mongodb://localhost/twitterdb'
 
-CONSUMER_KEY = "1l6Uaxb65mR6rqtvODXs1efB9"
-CONSUMER_SECRET = "CZVDMzoweq35K7BdXiynEcqw9kE9iFQPMDQyOJ6T8eUqL4aj0h"
-ACCESS_TOKEN = "702892689080115200-JANKXmIOyxk234nHqOwio9sSD213efz"
-ACCESS_TOKEN_SECRET = "RyR8nnFdz1SQiS3D9QMd039pnpajsq41A5H21lAo3sWQt"
+# CONSUMER_KEY = "1l6Uaxb65mR6rqtvODXs1efB9"
+# CONSUMER_SECRET = "CZVDMzoweq35K7BdXiynEcqw9kE9iFQPMDQyOJ6T8eUqL4aj0h"
+# ACCESS_TOKEN = "702892689080115200-JANKXmIOyxk234nHqOwio9sSD213efz"
+# ACCESS_TOKEN_SECRET = "RyR8nnFdz1SQiS3D9QMd039pnpajsq41A5H21lAo3sWQt"
+
+CONSUMER_KEY = "Nc6WlmocGdQJzwqS1n3rqdFya"
+CONSUMER_SECRET = "9go1rno2aum8zce5WMATxeXSO0wgA0u8YZv8qAnGRxWVZ94LFY"
+ACCESS_TOKEN = "1301970143044677633-yYVYr5A02UcGfhSmdDsQwQjQ5wHvO1"
+ACCESS_TOKEN_SECRET = "JmDEruY9gCIyZAwaeba7tbOAkLdGhIfAXnMjrGbYlapGs"
 
 # WORDS = ['#bigdata', '#AI', '#datascience', '#machinelearning', '#ml', '#iot', 'DuocUC']
 # WORDS = ['Biden', 'covid', 'Trump', 'democrats', 'Bernie', 'AOC']
@@ -130,3 +135,9 @@ if __name__ == '__main__':
     print("Utilizando las palabras: " + str(search_words))
 
     stream.filter(track=search_words)
+
+# CONSUMER_KEY = "Nc6WlmocGdQJzwqS1n3rqdFya"
+# CONSUMER_SECRET = "9go1rno2aum8zce5WMATxeXSO0wgA0u8YZv8qAnGRxWVZ94LFY"
+# ACCESS_TOKEN = "1301970143044677633-yYVYr5A02UcGfhSmdDsQwQjQ5wHvO1"
+# ACCESS_TOKEN_SECRET = "JmDEruY9gCIyZAwaeba7tbOAkLdGhIfAXnMjrGbYlapGs"
+# BEARER_TOKEN = AAAAAAAAAAAAAAAAAAAAANxVHgEAAAAAUMC37BeQ%2F57ve%2BSXb%2FpXu5ldGsM%3Dj7BZeaoayMZOPU3gC49iM7RNQpllkRvdBA7dWtqqlX2Dl9lnMp

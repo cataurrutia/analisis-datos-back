@@ -23,7 +23,7 @@ def get_date(fechastr):
 
 
 # Receiving a range of dates
-# example: http://127.0.0.1:5000/api/?start=2020-02-10&end=2020-07-15
+# example en local: http://127.0.0.1:5000/api/?start=2020-02-10&end=2020-07-15
 @app.route('/api/')
 def date_range():
     start = request.args.get('start', type=str)
@@ -45,7 +45,8 @@ def date_range():
 @app.route('/api/<int:id_region>')
 def get_region(id_region):
     # filter por region aquí
-    return str(id_region)
+    return f'parámetro {id_region} recibido'
+    # return str(id_region)
 
 
 def filtro():
