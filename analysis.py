@@ -39,7 +39,7 @@ class TweetObject():
             # Store info from "twitter_search" collection into pandas dataframe
             df = pdm.read_mongo("longfiltertweets", [], db)
 
-            # print(df.head())
+            print(df.head())
             return df
 
         except Error as e:
@@ -132,20 +132,21 @@ if __name__ == '__main__':
 
     data = TweetObject.connect_mongo(t)
 
-    data = t.clean_tweets(data)
+    # data = t.clean_tweets(data)
 
-    data['Sentiment'] = np.array([t.sentiment(x) for x in data['clean_tweets']])
+    # data['Sentiment'] = np.array([t.sentiment(x) for x in data['clean_tweets']])
+    data['Sentiment'] = np.array([t.sentiment(x) for x in data['tweet']])
 
-    t.word_cloud(data)
+    # t.word_cloud(data)
     t.save_to_csv(data)
 
-    pos_tweets = [tweet for index, tweet in enumerate(data["clean_tweets"]) if data["Sentiment"][index] > 0]
-    neg_tweets = [tweet for index, tweet in enumerate(data["clean_tweets"]) if data["Sentiment"][index] < 0]
-    neu_tweets = [tweet for index, tweet in enumerate(data["clean_tweets"]) if data["Sentiment"][index] == 0]
+    # pos_tweets = [tweet for index, tweet in enumerate(data["clean_tweets"]) if data["Sentiment"][index] > 0]
+    # neg_tweets = [tweet for index, tweet in enumerate(data["clean_tweets"]) if data["Sentiment"][index] < 0]
+    # neu_tweets = [tweet for index, tweet in enumerate(data["clean_tweets"]) if data["Sentiment"][index] == 0]
     tweet_count = data.shape[0]
 
     # Print results
-    print("Positive tweets: {}%".format(100 * (len(pos_tweets) / len(data['clean_tweets']))))
-    print("Negative tweets: {}%".format(100 * (len(neg_tweets) / len(data['clean_tweets']))))
-    print("Neutral tweets: {}%".format(100 * (len(neu_tweets) / len(data['clean_tweets']))))
+    # print("Positive tweets: {}%".format(100 * (len(pos_tweets) / len(data['clean_tweets']))))
+    # print("Negative tweets: {}%".format(100 * (len(neg_tweets) / len(data['clean_tweets']))))
+    # print("Neutral tweets: {}%".format(100 * (len(neu_tweets) / len(data['clean_tweets']))))
     print(f"De un total de: {tweet_count} tweets")
