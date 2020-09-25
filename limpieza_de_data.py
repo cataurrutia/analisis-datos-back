@@ -3,6 +3,7 @@ import re
 import pandas as pd
 import nltk
 import numpy as np
+import datetime as dt
 import matplotlib.pyplot as plt
 from pymongo import MongoClient
 from nltk.corpus import stopwords
@@ -22,9 +23,9 @@ class TweetObject:
             db = client.climateinfo
 
             # Store info from "filtered_stream" collection into pandas dataframe
-            df = pdm.read_mongo("filtered_stream2", [], db)
+            df = pdm.read_mongo("filtered_stream", [], db)
 
-            print(df.head())
+            # print(df.head())
             return df
 
         except Exception as e:
@@ -55,7 +56,7 @@ class TweetObject:
 
         df.loc[:, 'len'] = np.array([len(tweet) for tweet in df['clean_tweets']])
 
-        print(df.head())
+        # print(df.head())
         return df
 
     # Tweet manipulation: format date -> "Tue Aug 11 22:37:25 +0000 2020" to "11-08-2020"
@@ -125,7 +126,7 @@ class TweetObject:
             # Fill up columns with cleaned tweets and data length
             df.loc[:, 'fecha'][i] = fecha
 
-        print(df.head())
+        # print(df.head())
         return df
 
     # Tweet manipulation: identify region for each tweet and add it to dataframe
@@ -219,7 +220,7 @@ class TweetObject:
         df['region'] = nom_region
         df['id_region'] = id_region
 
-        print(df.head())
+        # print(df.head())
         return df
 
     # Tweet manipulation: sentiment analysis
@@ -260,8 +261,8 @@ class TweetObject:
 
         df['valoracion_manual'] = valores_manual
 
-        print(df.head())
-        print(df.dtypes)
+        # print(df.head())
+        # print(df.dtypes)
         return df
 
     # Tweet manipulation: agrupar por término más general
@@ -467,6 +468,18 @@ class TweetObject:
         print(df.dtypes)
         return df
 
+    # Save prepared data to csv
+    def save_to_csv(self, df):
+        try:
+            df.to_csv(f'csv/prepared_data{dt.date.today()}.csv')
+            print("\n")
+            print("csv successfully saved, yaaaaaaaaay! \n")
+
+        except Exception as e:
+            print(e)
+
+        return
+
 
 if __name__ == '__main__':
     t = TweetObject()
@@ -478,3 +491,5 @@ if __name__ == '__main__':
     data = t.add_region(data)
     data = t.sentiment(data)
     data = t.group_by_global(data)
+
+    t.save_to_csv(data)

@@ -67,7 +67,6 @@ class StreamListener(tweepy.StreamListener):
             raw_data = json.loads(data)
 
             # Select features
-            # id_str = raw_data['id_str']
             created_at = raw_data['created_at']
             tweet = raw_data['text']
             location = str(raw_data['user']['location'])
@@ -77,7 +76,6 @@ class StreamListener(tweepy.StreamListener):
                                                                                                    location):
                 # Save filtered tweets in dictionary
                 tweet_info = {
-                    # "id_str": id_str,
                     "created_at": created_at,
                     "tweet": tweet,
                     "location": location
@@ -89,7 +87,7 @@ class StreamListener(tweepy.StreamListener):
 
                 # Insert data into mongoDB in a collection called filtered_stream
                 # If filtered_stream doesn't exist, it will create it.
-                db.filtered_stream2.insert_one(tweet_info)
+                db.filtered_stream.insert_one(tweet_info)
 
         except Exception as e:
             print(e)
