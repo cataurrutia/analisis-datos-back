@@ -1,27 +1,18 @@
-# from __future__ import print_function
 import json
 import time
 import pandas as pd
-
+import re
 import tweepy
 from pymongo import MongoClient
 
+# Global variables
 MONGO_HOST = 'mongodb://localhost/twitterdb'
-
-# CONSUMER_KEY = "1l6Uaxb65mR6rqtvODXs1efB9"
-# CONSUMER_SECRET = "CZVDMzoweq35K7BdXiynEcqw9kE9iFQPMDQyOJ6T8eUqL4aj0h"
-# ACCESS_TOKEN = "702892689080115200-JANKXmIOyxk234nHqOwio9sSD213efz"
-# ACCESS_TOKEN_SECRET = "RyR8nnFdz1SQiS3D9QMd039pnpajsq41A5H21lAo3sWQt"
 
 CONSUMER_KEY = "Nc6WlmocGdQJzwqS1n3rqdFya"
 CONSUMER_SECRET = "9go1rno2aum8zce5WMATxeXSO0wgA0u8YZv8qAnGRxWVZ94LFY"
 ACCESS_TOKEN = "1301970143044677633-yYVYr5A02UcGfhSmdDsQwQjQ5wHvO1"
 ACCESS_TOKEN_SECRET = "JmDEruY9gCIyZAwaeba7tbOAkLdGhIfAXnMjrGbYlapGs"
 
-# WORDS = ['#bigdata', '#AI', '#datascience', '#machinelearning', '#ml', '#iot', 'DuocUC']
-# WORDS = ['Biden', 'covid', 'Trump', 'democrats', 'Bernie', 'AOC']
-# WORDS = ['climate change', 'global warming', 'climate tracking', 'climate action', 'pollution', 'co2 emissions ', 'greenhouse gas']
-# WORDS = ['Medioambiente', 'Chile', 'glaciares', 'cambioclimatico', 'Deshielo', 'calentamientoglobal']
 search_words = []
 
 
@@ -34,23 +25,24 @@ def limit_handler(cursor):
         time.sleep(1000)
 
 
-# Class to unpack google trends csv and select only the list of relevant topics
+# Load search words from csv
 def search_terms():
-    # load google trend csv
-    filter = pd.read_csv('csv/search_terms.csv')
-    filter = filter['Tema']
-
     global search_words
-    search_words = filter.to_list()
+
+    words = pd.read_csv('csv/search_terms.csv')
+    words = words['Tema']
+
+    search_words = words.to_list()
+
+    return search_words
 
 
 # Class provided by tweepy to access the Twitter Streaming API.
 class StreamListener(tweepy.StreamListener):
 
+    # Connect to the Streaming API
     def on_connect(self):
-        # Connect to the Streaming API
         api = tweepy.API(auth)
-
         print("You are now connected to the streaming API.")
 
         # Testing connection by listing the home timeline
@@ -59,56 +51,45 @@ class StreamListener(tweepy.StreamListener):
         #   print(tweet.text)
         #   print("-------------------------tweet del timeline------------------------------")
 
+    # On error display the error and status code
     def on_error(self, status_code):
-        # On error: display the error and status code
         print('An Error has occurred: ' + repr(status_code))
         return False
 
+    # When it finds a tweet
     def on_data(self, data):
         try:
-            # Connects to mongoDB
+            # Connects to mongoDB climateinfo, if it doesn't exist, it will create it.
             client = MongoClient(MONGO_HOST)
-
-            # Use twitter_db database. If it doesn't exist, it will create it.
-            # db = client.pruebadb
             db = client.climateinfo
 
-            # Decode JSON from Twitter
+            # Decode JSON from Twitter for each tweet
             raw_data = json.loads(data)
 
             # Select features
-            id_str = raw_data['id_str']
-            username = raw_data['user']['screen_name']
+            # id_str = raw_data['id_str']
             created_at = raw_data['created_at']
             tweet = raw_data['text']
-            retweet_count = raw_data['retweet_count']
-            if raw_data['place'] is not None:
-                place = raw_data['place']['country']
-                print(place)
-            else:
-                place = None
-            location = raw_data['user']['location']
+            location = str(raw_data['user']['location'])
 
-            # Save filtered tweets in dictionary
-            tweet_info = {
-                "id_str": id_str,
-                "username": username,
-                "created_at": created_at,
-                "tweet": tweet,
-                "retweet_count": retweet_count,
-                "place": place,
-                "location": location
-            }
+            # Save ONLY tweets from Chile to db
+            if re.search('[Cc]hile', location) or re.search('[Rr]egi[óo]n', location) or re.search('[Cc][Hh][Ll]',
+                                                                                                   location):
+                # Save filtered tweets in dictionary
+                tweet_info = {
+                    # "id_str": id_str,
+                    "created_at": created_at,
+                    "tweet": tweet,
+                    "location": location
+                }
 
-            # Print out a message to the screen that we have collected a tweet
-            print("Tweet creado el: " + str(created_at))
+                # Print out a message to the screen that we have collected a tweet
+                print("Tweet creado el: " + str(created_at))
+                print(tweet_info)
 
-            # Insert data into mongoDB in a collection called filtered_tweets
-            # If filtered_tweets doesn't exist, it will create it.
-            db.longfiltertweets.insert_one(tweet_info)
-
-            # Save full raw data from tweets
-            # db.raw_tweets.insert_one(raw_data)
+                # Insert data into mongoDB in a collection called filtered_stream
+                # If filtered_stream doesn't exist, it will create it.
+                db.filtered_stream2.insert_one(tweet_info)
 
         except Exception as e:
             print(e)
@@ -136,8 +117,4 @@ if __name__ == '__main__':
 
     stream.filter(track=search_words)
 
-# CONSUMER_KEY = "Nc6WlmocGdQJzwqS1n3rqdFya"
-# CONSUMER_SECRET = "9go1rno2aum8zce5WMATxeXSO0wgA0u8YZv8qAnGRxWVZ94LFY"
-# ACCESS_TOKEN = "1301970143044677633-yYVYr5A02UcGfhSmdDsQwQjQ5wHvO1"
-# ACCESS_TOKEN_SECRET = "JmDEruY9gCIyZAwaeba7tbOAkLdGhIfAXnMjrGbYlapGs"
 # BEARER_TOKEN = AAAAAAAAAAAAAAAAAAAAANxVHgEAAAAAUMC37BeQ%2F57ve%2BSXb%2FpXu5ldGsM%3Dj7BZeaoayMZOPU3gC49iM7RNQpllkRvdBA7dWtqqlX2Dl9lnMp
