@@ -25,14 +25,16 @@ def date_range():
     region = request.args.get('region', type=int)
 
     try:
-        fecha_inicio = datetime.datetime.strptime(start, "%Y-%m-%d").date()
-        fecha_fin = datetime.datetime.strptime(end, "%Y-%m-%d").date()
+        fecha_inicio = datetime.datetime.strptime(start, "%Y-%m-%d").date().ctime()
+        fecha_fin = datetime.datetime.strptime(end, "%Y-%m-%d").date().ctime()
+        #Se debe cambiar longfiltertweets por la coleccion que tiene la informacion filtrada 
         longfiltertweets = mongo.db.longfiltertweets
         output = []
-        for s in longfiltertweets.find({'created_at': {'$gte': 'Sat Sep 12 14:42:42 +0000 2020', '$lt':'Thu Sep 13 04:12:40 +0000 2020'}}):
+        for s in longfiltertweets.find({'created_at': {'$gte': fecha_inicio, '$lt':fecha_fin}}):
           output.append({'id_str' : s['id_str'],'username' : s['username'],'created_at' : s['created_at'],'tweet' : s['tweet']})
-        return jsonify({'longfiltertweets' : output})
-        # return jsonify(mongo.db)
+        return jsonify({'date': fecha_inicio, 'longfiltertweets' : output})
+#        return jsonify({'date': fecha_inicio}) 
+       # return jsonify(mongo.db)
     except Exception as e:
         print(e)
         # raise ValueError('{} is not valid date in the format YYYY-MM-DD'.format(fecha))
