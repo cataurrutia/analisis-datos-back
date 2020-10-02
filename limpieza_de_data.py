@@ -2,6 +2,7 @@ import pdmongo as pdm
 import re
 import pandas as pd
 import nltk
+import json
 import numpy as np
 import datetime as dt
 import matplotlib.pyplot as plt
@@ -19,7 +20,6 @@ class TweetObject:
         try:
             client = MongoClient(MONGO_HOST)
 
-            # db = client.pruebadb
             db = client.climateinfo
 
             # Store info from "filtered_stream" collection into pandas dataframe
@@ -464,8 +464,8 @@ class TweetObject:
 
         df['grupo_clave'] = valores_grupo
 
-        print(df.head())
-        print(df.dtypes)
+        # print(df.head())
+        # print(df.dtypes)
         return df
 
     # Save prepared data to csv
@@ -480,6 +480,19 @@ class TweetObject:
 
         return
 
+    # Consolidate
+    def save_to_collection(self, df):
+        client = MongoClient(MONGO_HOST)
+        db = client.climateinfo
+
+        # actually saves "list" type, i know, wtf
+        data_dict = df.to_dict('records')
+
+        db.prepared_tweets.insert(data_dict)
+
+        print('Saved to prepared_tweets collection')
+        return 'ok'
+
 
 if __name__ == '__main__':
     t = TweetObject()
@@ -493,3 +506,4 @@ if __name__ == '__main__':
     data = t.group_by_global(data)
 
     t.save_to_csv(data)
+    t.save_to_collection(data)

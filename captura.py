@@ -67,27 +67,33 @@ class StreamListener(tweepy.StreamListener):
             raw_data = json.loads(data)
 
             # Select features
+            t_id = raw_data['id']
             created_at = raw_data['created_at']
             tweet = raw_data['text']
             location = str(raw_data['user']['location'])
 
+            print(type(tweet))
+
             # Save ONLY tweets from Chile to db
             if re.search('[Cc]hile', location) or re.search('[Rr]egi[óo]n', location) or re.search('[Cc][Hh][Ll]',
                                                                                                    location):
+                tweet = tweet.encode('utf-8')
+                tweet = str(tweet)
                 # Save filtered tweets in dictionary
                 tweet_info = {
+                    "id": t_id,
                     "created_at": created_at,
                     "tweet": tweet,
                     "location": location
                 }
 
-                # Print out a message to the screen that we have collected a tweet
-                print("Tweet creado el: " + str(created_at))
-                print(tweet_info)
-
                 # Insert data into mongoDB in a collection called filtered_stream
                 # If filtered_stream doesn't exist, it will create it.
                 db.filtered_stream.insert_one(tweet_info)
+
+                # Print out a message to the screen that we have collected a tweet
+                print("Tweet creado el: " + str(created_at))
+                print(type(tweet))
 
         except Exception as e:
             print(e)
