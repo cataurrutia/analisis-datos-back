@@ -3,17 +3,14 @@ import pdmongo as pdm
 
 from flask import Flask, jsonify, render_template, url_for, request, redirect
 from flask_pymongo import PyMongo
-<<<<<<< HEAD
 from pymongo import MongoClient
 
 MONGO_HOST = 'mongodb://localhost:27017/climateinfo'
 app = Flask(__name__)
 app.config["MONGO_URI"] = MONGO_HOST
 mongo = PyMongo(app)
-=======
 
 MONGO_HOST = 'mongodb://localhost:27017/climateinfo'
->>>>>>> d69e34e5ae3b206ae2f4ea59b44e27085b4322d7
 
 app = Flask(__name__)
 app.config["MONGO_URI"] = MONGO_HOST
@@ -36,7 +33,6 @@ def date_range():
     try:
         fecha_inicio = datetime.datetime.strptime(start, "%Y-%m-%d").date().ctime()
         fecha_fin = datetime.datetime.strptime(end, "%Y-%m-%d").date().ctime()
-<<<<<<< HEAD
 
         collection = mongo.db.prepared_tweets
         output = []
@@ -50,8 +46,7 @@ def date_range():
         return jsonify({'date': fecha_inicio, 'prepared_tweets': output})
     # return jsonify(mongo.db)
 
-=======
-        #Se debe cambiar longfiltertweets por la coleccion que tiene la informacion filtrada 
+        #Se debe cambiar longfiltertweets por la coleccion que tiene la informacion filtrada
         longfiltertweets = mongo.db.longfiltertweets
         output = []
         for s in longfiltertweets.find({'created_at': {'$gte': fecha_inicio, '$lt':fecha_fin}}):
@@ -59,7 +54,6 @@ def date_range():
         return jsonify({'date': fecha_inicio, 'longfiltertweets' : output})
 #        return jsonify({'date': fecha_inicio}) 
        # return jsonify(mongo.db)
->>>>>>> d69e34e5ae3b206ae2f4ea59b44e27085b4322d7
     except Exception as e:
         print(e)
 
