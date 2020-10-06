@@ -17,6 +17,9 @@ class TweetObject:
             df = pdm.read_mongo("prepared_tweets", [], db)
 
             print(df.head())
+            print(df.dtypes)
+            print(df['fecha'])
+            print(df['id_region'])
             return df
 
         except Exception as e:

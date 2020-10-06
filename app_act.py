@@ -1,14 +1,12 @@
 import datetime
 import pdmongo as pdm
 
-from flask import Flask, jsonify, render_template, url_for, request, redirect
-from flask_pymongo import PyMongo
+from flask import Flask, render_template, url_for, request, redirect
 from pymongo import MongoClient
 
-MONGO_HOST = 'mongodb://localhost:27017/climateinfo'
 app = Flask(__name__)
-app.config["MONGO_URI"] = MONGO_HOST
-mongo = PyMongo(app)
+MONGO_HOST = 'mongodb://localhost/twitterdb'
+date_search = []
 
 
 @app.route('/')
@@ -26,23 +24,16 @@ def date_range():
     region = request.args.get('region', type=int)
 
     try:
-        fecha_inicio = datetime.datetime.strptime(start, "%Y-%m-%d").date().ctime()
-        fecha_fin = datetime.datetime.strptime(end, "%Y-%m-%d").date().ctime()
-
-        collection = mongo.db.prepared_tweets
-        output = []
-        # for t in collection.find({'created_at': {'$gte': fecha_inicio, '$lt': fecha_fin}}):
-        for t in collection.find({'id_region': region}):
-            output.append({'tweet': t['tweet'],
-                           'fecha': t['fecha'],
-                           'location': t['location'],
-                           'region': t['id_region']})
-            print(type(output))
-        return jsonify({'date': fecha_inicio, 'prepared_tweets': output})
-    # return jsonify(mongo.db)
+        fecha_inicio = datetime.datetime.strptime(start, "%Y-%m-%d").date()
+        fecha_fin = datetime.datetime.strptime(end, "%Y-%m-%d").date()
+        print(fecha_inicio)
+        print(fecha_fin)
+        print(region)
+        return render_template('index.html', fecha_inicio=fecha_inicio, fecha_fin=fecha_fin, region=region)
 
     except Exception as e:
         print(e)
+        # raise ValueError('{} is not valid date in the format YYYY-MM-DD'.format(fecha))
 
 
 # Receiving ONE string date: YYYY-mm-dd
@@ -55,6 +46,14 @@ def get_date(fechastr):
 
     except ValueError:
         raise ValueError('{} is not valid date in the format YYYY-MM-DD'.format(fechastr))
+
+
+# Receiving ID de la region
+@app.route('/api/<int:id_region>')
+def get_region(id_region):
+    # filter por region aquí
+    return f'parámetro {id_region} recibido'
+    # return str(id_region)
 
 
 def get_tweets(**kwargs):
