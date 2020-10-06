@@ -3,6 +3,12 @@ import pdmongo as pdm
 
 from flask import Flask, jsonify, render_template, url_for, request, redirect
 from flask_pymongo import PyMongo
+from pymongo import MongoClient
+
+MONGO_HOST = 'mongodb://localhost:27017/climateinfo'
+app = Flask(__name__)
+app.config["MONGO_URI"] = MONGO_HOST
+mongo = PyMongo(app)
 
 MONGO_HOST = 'mongodb://localhost:27017/climateinfo'
 
@@ -27,7 +33,20 @@ def date_range():
     try:
         fecha_inicio = datetime.datetime.strptime(start, "%Y-%m-%d").date().ctime()
         fecha_fin = datetime.datetime.strptime(end, "%Y-%m-%d").date().ctime()
-        #Se debe cambiar longfiltertweets por la coleccion que tiene la informacion filtrada 
+
+        collection = mongo.db.prepared_tweets
+        output = []
+        # for t in collection.find({'created_at': {'$gte': fecha_inicio, '$lt': fecha_fin}}):
+        for t in collection.find({'id_region': region}):
+            output.append({'tweet': t['tweet'],
+                           'fecha': t['fecha'],
+                           'location': t['location'],
+                           'region': t['id_region']})
+            print(type(output))
+        return jsonify({'date': fecha_inicio, 'prepared_tweets': output})
+    # return jsonify(mongo.db)
+
+        #Se debe cambiar longfiltertweets por la coleccion que tiene la informacion filtrada
         longfiltertweets = mongo.db.longfiltertweets
         output = []
         for s in longfiltertweets.find({'created_at': {'$gte': fecha_inicio, '$lt':fecha_fin}}):
@@ -37,7 +56,6 @@ def date_range():
        # return jsonify(mongo.db)
     except Exception as e:
         print(e)
-        # raise ValueError('{} is not valid date in the format YYYY-MM-DD'.format(fecha))
 
 
 # Receiving ONE string date: YYYY-mm-dd
@@ -50,14 +68,6 @@ def get_date(fechastr):
 
     except ValueError:
         raise ValueError('{} is not valid date in the format YYYY-MM-DD'.format(fechastr))
-
-
-# Receiving ID de la region
-@app.route('/api/<int:id_region>')
-def get_region(id_region):
-    # filter por region aquí
-    return f'parámetro {id_region} recibido'
-    # return str(id_region)
 
 
 def get_tweets(**kwargs):

@@ -1,3 +1,8 @@
+from pymongo import MongoClient
+from nltk.corpus import stopwords
+from googletrans import Translator
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
 import pdmongo as pdm
 import re
 import pandas as pd
@@ -6,10 +11,7 @@ import json
 import numpy as np
 import datetime as dt
 import matplotlib.pyplot as plt
-from pymongo import MongoClient
-from nltk.corpus import stopwords
-from googletrans import Translator
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import pymongo
 
 MONGO_HOST = 'mongodb://localhost/twitterdb'
 
@@ -488,9 +490,17 @@ class TweetObject:
         # actually saves "list" type, i know, wtf
         data_dict = df.to_dict('records')
 
-        db.prepared_tweets.insert(data_dict)
+        print(type(data_dict))
 
-        print('Saved to prepared_tweets collection')
+        # iteramos en el df to save one by one and bypass the DuplicateKeyError
+        for tweet in data_dict:
+            try:
+                db.prepared_tweets.insert_one(tweet)
+                print('Saved to prepared_tweets collection')
+                pass
+            except pymongo.errors.DuplicateKeyError:
+                continue
+
         return 'ok'
 
 
@@ -505,5 +515,5 @@ if __name__ == '__main__':
     data = t.sentiment(data)
     data = t.group_by_global(data)
 
-    t.save_to_csv(data)
+    # t.save_to_csv(data)
     t.save_to_collection(data)
