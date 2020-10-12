@@ -29,7 +29,7 @@ def limit_handler(cursor):
 def search_terms():
     global search_words
 
-    words = pd.read_csv('csv/search_terms.csv')
+    words = pd.read_csv('../csv/search_terms.csv')
     words = words['Tema']
 
     search_words = words.to_list()
@@ -77,7 +77,7 @@ class StreamListener(tweepy.StreamListener):
             # Save ONLY tweets from Chile to db
             if re.search('[Cc]hile', location) or re.search('[Rr]egi[óo]n', location) or re.search('[Cc][Hh][Ll]',
                                                                                                    location):
-                # tweet = tweet.encode('utf-8')
+                tweet = tweet.encode('utf-8')
                 tweet = str(tweet)
                 # Save filtered tweets in dictionary
                 tweet_info = {
