@@ -6,15 +6,13 @@ from flask_pymongo import PyMongo
 from pymongo import MongoClient
 
 MONGO_HOST = 'mongodb://localhost:27017/climateinfo'
-app = Flask(__name__)
-app.config["MONGO_URI"] = MONGO_HOST
-mongo = PyMongo(app)
 
-MONGO_HOST = 'mongodb://localhost:27017/climateinfo'
+# mongodb://167.99.231.117:27017/climateinfo
 
 app = Flask(__name__)
 app.config["MONGO_URI"] = MONGO_HOST
 mongo = PyMongo(app)
+
 
 @app.route('/')
 def hello_world():
@@ -36,24 +34,23 @@ def date_range():
 
         collection = mongo.db.prepared_tweets
         output = []
-        # for t in collection.find({'created_at': {'$gte': fecha_inicio, '$lt': fecha_fin}}):
+        #
         for t in collection.find({'id_region': region}):
             output.append({'tweet': t['tweet'],
                            'fecha': t['fecha'],
                            'location': t['location'],
                            'region': t['id_region']})
-            print(type(output))
-        return jsonify({'date': fecha_inicio, 'prepared_tweets': output})
+
+        print(type(output))
+
+        for t in collection.find({'created_at': {'$gte': fecha_inicio, '$lt': fecha_fin}}):
+            print(t)
+            return jsonify({'date': fecha_inicio, 'prepared_tweets': output})
+
+
+    # return jsonify({'date': fecha_inicio})
     # return jsonify(mongo.db)
 
-        #Se debe cambiar longfiltertweets por la coleccion que tiene la informacion filtrada
-        longfiltertweets = mongo.db.longfiltertweets
-        output = []
-        for s in longfiltertweets.find({'created_at': {'$gte': fecha_inicio, '$lt':fecha_fin}}):
-          output.append({'id_str' : s['id_str'],'username' : s['username'],'created_at' : s['created_at'],'tweet' : s['tweet']})
-        return jsonify({'date': fecha_inicio, 'longfiltertweets' : output})
-#        return jsonify({'date': fecha_inicio}) 
-       # return jsonify(mongo.db)
     except Exception as e:
         print(e)
 
