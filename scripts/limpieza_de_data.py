@@ -247,6 +247,9 @@ class TweetObject:
         valor = []
 
         # translate each tweet
+        print("")
+        print(".     . Translating tweets... ")
+
         for row in df['clean_tweets']:
             tr = translator.translate(str(row))
             valor.append(tr.text)
@@ -261,6 +264,8 @@ class TweetObject:
         valores_id_sentimiento = []
         valores_manual = []
 
+        print("")
+        print(".     . Analizando polaridad de cada tweet... ")
         for row in df['traduccion']:
             res = analisis.polarity_scores(str(row))
 
