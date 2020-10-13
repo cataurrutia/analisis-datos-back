@@ -19,6 +19,9 @@ MONGO_HOST = 'mongodb://localhost/twitterdb'
 class TweetObject:
     # connection
     def connect_mongo(self):
+        print("")
+        print("Connecting to database and creating dataframe...")
+
         try:
             client = MongoClient(MONGO_HOST)
 
@@ -35,6 +38,9 @@ class TweetObject:
 
     # Tweet manipulation: remove stopwords and 'rt', 'http', 'co', 'RT'
     def clean_tweets(self, df):
+        print("")
+        print("Manipulating [tweet], clean text...")
+
         # stop = nltk.download('stopwords')
         stopword_list = stopwords.words('spanish')
 
@@ -63,6 +69,9 @@ class TweetObject:
 
     # Tweet manipulation: format date -> "Tue Aug 11 22:37:25 +0000 2020" to "11-08-2020"
     def set_fecha(self, df):
+        print("")
+        print("Manipulating [created_at], creating [fecha]...")
+
         df['fecha'] = None
         valores_dias = []
         valores_meses = []
@@ -133,6 +142,9 @@ class TweetObject:
 
     # Tweet manipulation: identify region for each tweet and add it to dataframe
     def add_region(self, df):
+        print("")
+        print("Manipulating [location], creating [region] and [id_region]...")
+
         nom_region = []
         id_region = []
 
@@ -227,6 +239,9 @@ class TweetObject:
 
     # Tweet manipulation: sentiment analysis
     def sentiment(self, df):
+        print("")
+        print("Interpreting [tweet], creating [valoracion_manual]...")
+
         # - - - - Translate - - - -
         translator = Translator()
         valor = []
@@ -269,6 +284,9 @@ class TweetObject:
 
     # Tweet manipulation: agrupar por término más general
     def group_by_global(self, df):
+        print("")
+        print("Group by [grupo_clave]...")
+
         palabras_claves = {0: 'Biodiversidad', 1: 'Agua Potable', 2: 'Biodegradable', 3: 'Biofuel', 4: 'Biomasa',
                            5: 'Biorregionalismo', 6: 'Bosque', 7: 'Calentamiento Global', 8: 'Cambio Climático',
                            9: 'Capa de Ozono', 10: 'Comisión Nacional del Medio Ambiente', 11: 'Contaminación',
@@ -484,13 +502,14 @@ class TweetObject:
 
     # Consolidate
     def save_to_collection(self, df):
+        print("")
+        print("Saving to prepared_tweets collection...")
+
         client = MongoClient(MONGO_HOST)
         db = client.climateinfo
 
         # actually saves "list" type, i know, wtf
         data_dict = df.to_dict('records')
-
-        print(type(data_dict))
 
         # iteramos en el df to save one by one and bypass the DuplicateKeyError
         for tweet in data_dict:
