@@ -45,8 +45,7 @@ class TweetObject:
         stopword_list = stopwords.words('spanish')
 
         # Create additional columns
-        df['clean_tweets'] = None
-        df['len'] = None
+        clean_tweets = []
 
         # get rid of anything that isn't a letter
         for i in range(0, len(df['tweet'])):
@@ -59,10 +58,13 @@ class TweetObject:
             words = text.split()
             words = [word for word in words if not word in stopword_list]
 
-            # Fill up columns with cleaned tweets and data length
-            df.loc[:, 'clean_tweets'][i] = ' '.join(words)
+            # Fill up columns with cleaned tweets
+            clean_t = ' '.join(words)
+            clean_t = clean_t[2:]
+            clean_tweets.append(clean_t)
 
-        df.loc[:, 'len'] = np.array([len(tweet) for tweet in df['clean_tweets']])
+        df['clean_tweets'] = clean_tweets
+        df['len'] = np.array([len(tweet) for tweet in df['clean_tweets']])
 
         # print(df.head())
         return df
@@ -72,13 +74,13 @@ class TweetObject:
         print("")
         print("Manipulating [created_at], creating [fecha]...")
 
-        df['fecha'] = None
+        serie_fecha = []
         valores_dias = []
         valores_meses = []
         valores_anos = []
         id_mes = []  # número del día en el mes
 
-        # for each tweet use created_at to make formated "fecha_tweet" column
+        # for created_at turn to new days, months, etc
         for row in df['created_at']:
             ano = row[26:30]
             valores_anos.append(ano)
@@ -130,12 +132,14 @@ class TweetObject:
             else:
                 valores_meses.append(0)
 
-        #
+        # for each date make formatted "fecha" column
         for i in range(len(valores_dias)):
             fecha = (id_mes[i] + '-' + str(valores_meses[i]) + '-' + valores_anos[i])
 
             # Fill up columns with cleaned tweets and data length
-            df.loc[:, 'fecha'][i] = fecha
+            serie_fecha.append(fecha)
+
+        df['fecha'] = serie_fecha
 
         # print(df.head())
         return df
@@ -244,18 +248,17 @@ class TweetObject:
 
         # - - - - Translate - - - -
         translator = Translator()
-        valor = []
+        traduccion = []
 
         # translate each tweet
-        print("")
-        print(".     . Translating tweets... ")
+        print("     - Translating tweets... ")
 
         for row in df['clean_tweets']:
             tr = translator.translate(str(row))
-            valor.append(tr.text)
-            print(tr.text)
+            traduccion.append(tr.text)
+            # print(tr.text)
 
-        df['traduccion'] = valor
+        df['traduccion'] = traduccion
 
         # - - - - Analyze valoracion (polaridad) - - - -
         analisis = SentimentIntensityAnalyzer()
@@ -266,8 +269,7 @@ class TweetObject:
         valores_id_sentimiento = []
         valores_manual = []
 
-        print("")
-        print(".     . Analizando polaridad de cada tweet... ")
+        print("     - Analizando polaridad de cada tweet... ")
         for row in df['traduccion']:
             res = analisis.polarity_scores(str(row))
 
@@ -292,7 +294,7 @@ class TweetObject:
     # Tweet manipulation: agrupar por término más general
     def group_by_global(self, df):
         print("")
-        print("Group by [grupo_clave]...")
+        print("Grouping by [grupo_clave]...")
 
         palabras_claves = {0: 'Biodiversidad', 1: 'Agua Potable', 2: 'Biodegradable', 3: 'Biofuel', 4: 'Biomasa',
                            5: 'Biorregionalismo', 6: 'Bosque', 7: 'Calentamiento Global', 8: 'Cambio Climático',
@@ -510,7 +512,9 @@ class TweetObject:
     # Consolidate
     def save_to_collection(self, df):
         print("")
-        print("Saving to prepared_tweets collection...")
+        print("Saving to <prepared_tweets> collection...")
+
+        # print(df.head())
 
         client = MongoClient(MONGO_HOST)
         db = client.climateinfo
@@ -522,11 +526,10 @@ class TweetObject:
         for tweet in data_dict:
             try:
                 db.prepared_tweets.insert_one(tweet)
-                print('Saved to prepared_tweets collection')
-                pass
             except pymongo.errors.DuplicateKeyError:
                 continue
 
+        print('... Saved to <prepared_tweets> collection.')
         return 'ok'
 
 
@@ -543,3 +546,6 @@ if __name__ == '__main__':
 
     # t.save_to_csv(data)
     t.save_to_collection(data)
+
+    print(data.head())
+    print(data.dtypes)

@@ -81,5 +81,48 @@ def get_tweets(**kwargs):
     pass
 
 
+@app.route('/json/')
+def prueba_json():
+    data = request.args.get('data', type=int)
+
+    num = 7
+    dic1 = {
+        "key1": 10,
+        "key2": 1,
+        "key3": num
+    }
+
+    dic2 = {
+        "palabra1": 1,
+        "palabra2": 10,
+        "palabra3": 25,
+        "palabra4": 2,
+        "palabra5": 20,
+        "palabra6": 30
+    }
+
+    dic3 = {
+        "value1": 1,
+        "value2": 2,
+        "value3": 3,
+        "value4": 4,
+        "value5": 5,
+        "value6": 6,
+        "value7": 7,
+        "value8": 8,
+        "value9": 9,
+        "value10": 10,
+        "value11": 11,
+        "value12": 12
+    }
+
+    if data == 1:
+        return jsonify(dic1)
+    elif data == 2:
+        return jsonify(dic2)
+    elif data == 3:
+        return jsonify(dic3)
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
