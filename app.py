@@ -1,5 +1,6 @@
 import datetime
 import pdmongo as pdm
+import pandas as pd
 
 from flask import Flask, jsonify, render_template, url_for, request, redirect
 from flask_pymongo import PyMongo
@@ -20,7 +21,6 @@ def hello_world():
 
 
 # Receiving a range of dates and region
-# example /api/?start=2020-02-10&end=2020-07-15
 # example /api/?start=2020-09-14&end=2020-09-16&region=5
 @app.route('/api/')
 def date_range():
@@ -67,7 +67,29 @@ def get_date(fechastr):
         raise ValueError('{} is not valid date in the format YYYY-MM-DD'.format(fechastr))
 
 
-def get_tweets(**kwargs):
+# Devuelve json
+@app.route('/json/')
+def prueba_json():
+    data_solicitada = request.args.get('data', type=int)
+
+    data1 = pd.read_csv('csv/dictionaries.csv')
+    data2 = pd.read_csv('csv/dictionaries2.csv')
+    data3 = pd.read_csv('csv/dictionaries3.csv')
+
+    dict1 = dict(zip(data1['tema'], data1['rep']))
+    dict2 = dict(zip(data2['tema'], data2['rep']))
+    dict3 = dict(zip(data3['tema'], data3['rep']))
+
+    if data_solicitada == 1:
+        return jsonify(dict1)
+    elif data_solicitada == 2:
+        return jsonify(dict2)
+    elif data_solicitada == 3:
+        return jsonify(dict3)
+
+
+# Va a buscar info
+def get_twe(**kwargs):
     client = MongoClient(MONGO_HOST)
     db = client.climateinfo
     col = db.filtered_stream
@@ -80,48 +102,6 @@ def get_tweets(**kwargs):
 
     pass
 
-
-@app.route('/json/')
-def prueba_json():
-    data = request.args.get('data', type=int)
-
-    num = 7
-    dic1 = {
-        "key1": 10,
-        "key2": 1,
-        "key3": num
-    }
-
-    dic2 = {
-        "palabra1": 1,
-        "palabra2": 10,
-        "palabra3": 25,
-        "palabra4": 2,
-        "palabra5": 20,
-        "palabra6": 30
-    }
-
-    dic3 = {
-        "value1": 1,
-        "value2": 2,
-        "value3": 3,
-        "value4": 4,
-        "value5": 5,
-        "value6": 6,
-        "value7": 7,
-        "value8": 8,
-        "value9": 9,
-        "value10": 10,
-        "value11": 11,
-        "value12": 12
-    }
-
-    if data == 1:
-        return jsonify(dic1)
-    elif data == 2:
-        return jsonify(dic2)
-    elif data == 3:
-        return jsonify(dic3)
 
 
 if __name__ == '__main__':
