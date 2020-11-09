@@ -16,11 +16,6 @@ class TweetObject:
 
             # Store info from "filtered_stream" collection into pandas dataframe
             df = pdm.read_mongo("prepared_tweets", [], db)
-
-            print(df.head())
-            print(df.dtypes)
-            print(df['fecha'])
-            print(df['id_region'])
             return df
 
         except Exception as e:
@@ -33,11 +28,14 @@ class TweetObject:
         data2 = pd.read_csv('csv/dictionaries2.csv')
         data3 = pd.read_csv('csv/dictionaries3.csv')
 
-        # print(words)
+        # dict1 = dict(zip(data1['id'], (data1['tema'], data1['rep']))
+        dict1 = data1.to_json(orient='index')
+        dict2 = data2.to_json(orient='index')
+        dict3 = data3.to_json(orient='index')
 
-        dict1 = data1
-        dict2 = data2
-        dict3 = data3
+        print(dict1)
+        print(dict2)
+        print(dict3)
 
 
 if __name__ == '__main__':
