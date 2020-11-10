@@ -28,7 +28,6 @@ class TweetObject:
         data2 = pd.read_csv('csv/dictionaries2.csv')
         data3 = pd.read_csv('csv/dictionaries3.csv')
 
-        # dict1 = dict(zip(data1['id'], (data1['tema'], data1['rep']))
         dict1 = data1.to_json(orient='index')
         dict2 = data2.to_json(orient='index')
         dict3 = data3.to_json(orient='index')

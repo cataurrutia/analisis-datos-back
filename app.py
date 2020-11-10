@@ -76,9 +76,9 @@ def prueba_json():
     data2 = pd.read_csv('csv/dictionaries2.csv')
     data3 = pd.read_csv('csv/dictionaries3.csv')
 
-    dict1 = dict(zip(data1['tema'], data1['rep']))
-    dict2 = dict(zip(data2['tema'], data2['rep']))
-    dict3 = dict(zip(data3['tema'], data3['rep']))
+    dict1 = data1.to_json(orient='index')
+    dict2 = data2.to_json(orient='index')
+    dict3 = data3.to_json(orient='index')
 
     if data_solicitada == 1:
         return jsonify(dict1)
