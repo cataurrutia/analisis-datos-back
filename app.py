@@ -1,23 +1,48 @@
 import datetime
 import pdmongo as pdm
 import pandas as pd
+import re
+import matplotlib.pyplot as plt
+import numpy as np
 
+from collections import Counter
+from wordcloud import WordCloud, STOPWORDS
 from flask import Flask, jsonify, render_template, url_for, request, redirect
 from flask_pymongo import PyMongo
 from pymongo import MongoClient
-
-MONGO_HOST = 'mongodb://localhost:27017/climateinfo'
-
-# mongodb://167.99.231.117:27017/climateinfo
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer
+from nltk.stem import WordNetLemmatizer
+from wordcloud import WordCloud, STOPWORDS
 
 app = Flask(__name__)
+
+MONGO_HOST = 'mongodb://localhost:27017/climateinfo'
+client = MongoClient(MONGO_HOST)
 app.config["MONGO_URI"] = MONGO_HOST
+
+db = client.climateinfo
 mongo = PyMongo(app)
 
 
+# on load
 @app.route('/')
 def hello_world():
-    return render_template('index.html')
+    words = pd.read_csv('csv/search_terms_unique.csv')
+    search_words = tuple(words['Tema'].to_list())
+    print(type(search_words))
+
+    grupo_clave = ('Otro Grupo', 'Bosques', 'Cambio Climático', 'Recursos Naturales', 'Medio Ambiente',
+                   'Industrias', 'Contaminación', 'Biología', 'Instituciones')
+
+    regiones = ('I Tarapacá', 'II Antofagasta', 'III Atacama', 'IV Coquimbo', 'V Valparaíso',
+                "VI O'Higgins", 'VII Maule', 'VIII Bíobío', 'IX Araucanía', 'X Los Lagos',
+                'XI Aysén', 'XII Magallanes', 'RM Metropolitana', 'XIV Los Ríos',
+                'XV Arica y Parinacota', 'XVI Ñuble', 'No Especifíca')
+
+    # return jsonify(search_words)
+    return render_template('index.html', words=search_words, regiones=regiones, grupo_clave=grupo_clave)
 
 
 # Receiving a range of dates and region
@@ -55,16 +80,85 @@ def date_range():
         print(e)
 
 
-# Receiving ONE string date: YYYY-mm-dd
-@app.route('/api/<string:fechastr>')
-def get_date(fechastr):
-    try:
-        fecha = datetime.datetime.strptime(fechastr, "%Y-%m-%d").date()
-        # hacer algo con fecha
-        return fechastr
+# sumario valoración palabra
+@app.route('/valoracion/')
+def resumen_valoracion():
+    palabra = request.args.get('palabra', type=str)
 
-    except ValueError:
-        raise ValueError('{} is not valid date in the format YYYY-MM-DD'.format(fechastr))
+    df = pdm.read_mongo("prepared_tweets", [], db)
+    # print(df.head())
+
+    if palabra == 'todas':
+        try:
+            pos_tweets = [tweet for index, tweet in enumerate(df["clean_tweets"]) if
+                          re.search('Positivo', df['valoracion_manual'][index])]
+            neg_tweets = [tweet for index, tweet in enumerate(df["clean_tweets"]) if
+                          re.search('Negativo', df['valoracion_manual'][index])]
+            neu_tweets = [tweet for index, tweet in enumerate(df["clean_tweets"]) if
+                          re.search('Neutro', df['valoracion_manual'][index])]
+
+            valoraciones = {
+                "palabra": palabra,
+                "total_tweets": len(df['clean_tweets']),
+                "can_pos": len(pos_tweets),
+                "can_neg": len(neg_tweets),
+                "can_neu": len(neu_tweets)
+            }
+
+            # print(valoraciones)
+            return jsonify(valoraciones)
+
+        except ValueError as e:
+            pass
+    else:
+        try:
+            pos_tweets = [tweet for index, tweet in enumerate(df["clean_tweets"]) if
+                          re.search('Positivo', df['valoracion_manual'][index])]
+            neg_tweets = [tweet for index, tweet in enumerate(df["clean_tweets"]) if
+                          re.search('Negativo', df['valoracion_manual'][index])]
+            neu_tweets = [tweet for index, tweet in enumerate(df["clean_tweets"]) if
+                          re.search('Neutro', df['valoracion_manual'][index])]
+
+            valoraciones = {
+                "palabra": palabra,
+                "total_tweets": len(df['clean_tweets']),
+                "can_pos": 0,
+                "can_neg": 0,
+                "can_neu": 0
+            }
+
+            # print(valoraciones)
+            return jsonify(valoraciones)
+
+        except ValueError as e:
+            pass
+
+
+# palabra más repetida
+@app.route('/palabra/')
+def mas_repetida():
+    palabra = request.args.get('palabra', type=str)
+    df = pdm.read_mongo("prepared_tweets", [], db)
+
+    if palabra == 'todas':
+        try:
+            result = Counter(" ".join(df["clean_tweets"]).split()).most_common(50)
+            # print(result)
+
+            result_df = pd.DataFrame(result, columns=['Palabra', 'Frequencia']).set_index('Palabra')
+            print(result_df)
+            result_df = result_df.to_json(orient='columns')
+
+            return result_df
+
+        except ValueError as e:
+            pass
+    else:
+        try:
+            return palabra
+
+        except ValueError as e:
+            pass
 
 
 # Devuelve json
@@ -101,7 +195,6 @@ def get_twe(**kwargs):
     query_region = {"region": region}
 
     pass
-
 
 
 if __name__ == '__main__':
